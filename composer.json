@@ -1,0 +1,23 @@
+{
+    "name": "gr426_masge/hihrjar-m6",
+    "description": "pervoe",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "dumdumik",
+            "email": "fjdvgt149@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "php": "^7.4 | ^8.0"
+
+    },
+    "autoload": {
+        "psr-4": {
+            "Src\\": "core/Src/",
+            "": "app/"
+        }
+    }
+}
