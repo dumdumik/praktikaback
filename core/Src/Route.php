@@ -6,6 +6,7 @@ use Error;
 
 class Route
 {
+
     private static array $routes = [];
     private static string $prefix = '';
 
@@ -41,7 +42,7 @@ class Route
             throw new Error('This method does not exist');
         }
 
+        call_user_func([new $class, $action], new Request());
 
-        call_user_func([new $class, $action]);
     }
 }
