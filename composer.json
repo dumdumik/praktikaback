@@ -14,7 +14,9 @@
         "php": "^7.4 | ^8.0",
         "illuminate/database": "10.x-dev",
         "illuminate/events": "10.x-dev",
-        "nikic/fast-route": "^1.3"
+        "nikic/fast-route": "^1.3",
+        "dumdumik/collect": "dev-main",
+        "dumdumik/hrvalidator": "dev-main"
     },
     "autoload": {
         "psr-4": {
