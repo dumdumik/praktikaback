@@ -1,13 +1,10 @@
-<h2>Авторизация</h2>
-<h3><?= $message ?? ''; ?></h3>
-
-<h3><?= app()->auth->user()->name ?? ''; ?></h3>
-<?php
-if (!app()->auth::check()):
-    ?>
+<div>
+    <h3>Вход в систему</h3>
     <form method="post">
-        <label>Логин <input type="text" name="login"></label>
-        <label>Пароль <input type="password" name="password"></label>
+        <input name="csrf_token" type="hidden" value="<?= app()->auth::generateCSRF() ?>"/>
+        <label>Email</label><input type="text" name="email">
+        <label>Пароль</label><input type="password" name="password">
         <button>Войти</button>
     </form>
-<?php endif;
+    <h3><?= $message ?? ''; ?></h3>
+</div>
