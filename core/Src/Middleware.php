@@ -10,48 +10,70 @@ use Src\Traits\SingletonTrait;
 
 class Middleware
 {
-    //Используем трейт
-    use SingletonTrait;
+   //Используем трейт
+   use SingletonTrait;
 
-    private RouteCollector $middlewareCollector;
+   private RouteCollector $middlewareCollector;
 
-    public function add($httpMethod, string $route, array $action): void
+   public function add($httpMethod, string $route, array $action): void
+   {
+       $this->middlewareCollector->addRoute($httpMethod, $route, $action);
+   }
+
+   public function group(string $prefix, callable $callback): void
+   {
+       $this->middlewareCollector->addGroup($prefix, $callback);
+   }
+
+   //Конструктор скрыт. Вызывается только один раз
+   private function __construct()
+   {
+       $this->middlewareCollector = new RouteCollector(new Std(), new MarkBased());
+   }
+
+   public function go(string $httpMethod, string $uri, Request $request): Request
     {
-        $this->middlewareCollector->addRoute($httpMethod, $route, $action);
+        return $this->runMiddlewares($httpMethod, $uri, $this->runAppMiddlewares($request));
     }
 
-    public function group(string $prefix, callable $callback): void
-    {
-        $this->middlewareCollector->addGroup($prefix, $callback);
-    }
+   //Запуск всех middlewares для текущего маршрута
+//Запуск всех middlewares для текущего маршрута
+private function runMiddlewares(string $httpMethod, string $uri, Request $request): Request
+{
+   //Получаем список всех разрешенных классов middlewares из настроек приложения
+   $routeMiddleware = app()->settings->app['routeMiddleware'];
 
-    //Конструктор скрыт. Вызывается только один раз
-    private function __construct()
-    {
-        $this->middlewareCollector = new RouteCollector(new Std(), new MarkBased());
-    }
+   //Перебираем все middlewares для текущего адреса
+   foreach ($this->getMiddlewaresForRoute($httpMethod, $uri) as $middleware) {
+       $args = explode(':', $middleware);
+       //Создаем объект и вызываем метод handle
+       $request = (new $routeMiddleware[$args[0]])->handle($request, $args[1]?? null) ?? $request;
+   }
+   //Возвращаем итоговый request
+   return $request;
+}
 
-    //Запуск всех middlewares для текущего маршрута
-    public function runMiddlewares(string $httpMethod, string $uri): Request
-    {
-        $request = new Request();
-        //Получаем список всех разрешенных классов middlewares из настроек приложения
-        $routeMiddleware = app()->settings->app['routeMiddleware'];
+//Запуск всех глобальных middlewares
+private function runAppMiddlewares(Request $request): Request
+{
+   //Получаем список всех разрешенных классов middlewares из настроек приложения
+   $routeMiddleware = app()->settings->app['routeAppMiddleware'];
 
-        //Перебираем все middlewares для текущего адреса
-        foreach ($this->getMiddlewaresForRoute($httpMethod, $uri) as $middleware) {
-            $args = explode(':', $middleware);
-            //Создаем объект и вызываем метод handle
-            (new $routeMiddleware[$args[0]])->handle($request, $args[1]?? null);
-        }
-        //Возвращаем итоговый request
-        return $request;
-    }
+   //Перебираем и запускаем их
+   foreach ($routeMiddleware as $name => $class) {
+       $args = explode(':', $name);
+       $request = (new $class)->handle($request, $args[1]?? null) ?? $request;
+   }
+   return $request;
+}
 
-    //Поиск middlewares по адресу
-    private function getMiddlewaresForRoute(string $httpMethod, string $uri): array
-    {
-        $dispatcherMiddleware = new Dispatcher($this->middlewareCollector->getData());
-        return $dispatcherMiddleware->dispatch($httpMethod, $uri)[1] ?? [];
-    }
+
+   //Поиск middlewares по адресу
+   private function getMiddlewaresForRoute(string $httpMethod, string $uri): array
+   {
+       $dispatcherMiddleware = new Dispatcher($this->middlewareCollector->getData());
+       return $dispatcherMiddleware->dispatch($httpMethod, $uri)[1] ?? [];
+   }
+
+
 }

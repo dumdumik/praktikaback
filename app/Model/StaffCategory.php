@@ -6,20 +6,20 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Src\Auth\IdentityInterface;
 
-class Position extends Model
+class StaffCategory extends Model
 {
    use HasFactory;
    public $timestamps = false;
 
-    protected $table = 'positions';
-    protected $primaryKey = 'position_id';
+    protected $table = 'staff_categories';
+    protected $primaryKey = 'staff_category_id';
    protected $fillable = [
-    'position_name'
+    'staff_category_name'
    ];
 
    public function employees()
     {
-        return $this->hasMany(Employee::class, 'position_id');
+        return $this->hasMany(Employee::class, 'staff_category_id');
     }
 }
 

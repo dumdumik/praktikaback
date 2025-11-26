@@ -1,44 +1,58 @@
 <div class="auth-container">
     <div class="auth-card">
-        <h2>Авторизация</h2>
-        <div class="auth-message"><?= $message ?? ''; ?></div>
+        <h2>Регистрация нового пользователя</h2>
 
-        <?php if (!app()->auth::check()): ?>
-            <form method="post" class="auth-form">
-                <input name="csrf_token" type="hidden" value="<?= app()->auth::generateCSRF() ?>"/>
+        <?php if (isset($message) && $message): ?>
+            <div class="auth-message error">
+                <?= $message ?>
+            </div>
+        <?php endif; ?>
 
+        <form method="post" class="auth-form">
+            <input name="csrf_token" type="hidden" value="<?= app()->auth::generateCSRF() ?>"/>
+
+            <div class="form-row">
                 <div class="form-group">
                     <div class="input-wrapper">
-                        <input type="text" name="login" placeholder=" " required>
-                        <label>Логин</label>
+                        <input type="text" name="name" placeholder=" " value="<?= htmlspecialchars($old['name'] ?? '') ?>" required>
+                        <label>Имя</label>
                         <span class="input-icon">👤</span>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <div class="input-wrapper">
-                        <input type="password" name="password" placeholder=" " required>
-                        <label>Пароль</label>
-                        <span class="input-icon">🔒</span>
+                        <input type="text" name="lastName" placeholder=" " value="<?= htmlspecialchars($old['lastName'] ?? '') ?>" required>
+                        <label>Фамилия</label>
+                        <span class="input-icon">👥</span>
                     </div>
                 </div>
-
-                <button type="submit" class="auth-button">
-                    <span>Войти</span>
-                    <div class="button-loader"></div>
-                </button>
-
-                <div class="auth-links">
-                    <a href="<?= app()->route->getUrl('/signup') ?>">Нет аккаунта? Зарегистрируйтесь</a>
-                </div>
-            </form>
-        <?php else: ?>
-            <div class="welcome-message">
-                <h3>Добро пожаловать, <?= htmlspecialchars(app()->auth->user()->name) ?>!</h3>
-                <p>Вы уже авторизованы в системе.</p>
-                <a href="<?= app()->route->getUrl('/dashboard') ?>" class="dashboard-link">Перейти в дашборд</a>
             </div>
-        <?php endif; ?>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="text" name="login" placeholder=" " value="<?= htmlspecialchars($old['login'] ?? '') ?>" required>
+                    <label>Логин</label>
+                    <span class="input-icon">🔑</span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-wrapper">
+                    <input type="password" name="password" placeholder=" " required>
+                    <label>Пароль</label>
+                    <span class="input-icon">🔒</span>
+                </div>
+            </div>
+
+            <button type="submit" class="auth-button">
+                <span>Зарегистрироваться</span>
+            </button>
+
+            <div class="auth-links">
+                <a href="<?= app()->route->getUrl('/') ?>">Уже есть аккаунт? Войдите</a>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -58,7 +72,7 @@
         border-radius: 20px;
         box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
         width: 100%;
-        max-width: 450px;
+        max-width: 500px;
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
@@ -70,20 +84,27 @@
         font-weight: 600;
     }
 
-    .auth-message {
+    .auth-message.error {
         background: #e74c3c;
         color: white;
-        padding: 12px;
-        border-radius: 8px;
-        margin-bottom: 20px;
+        padding: 15px;
+        border-radius: 10px;
+        margin-bottom: 25px;
         text-align: center;
-        font-size: 0.9em;
+        font-size: 0.95em;
+        line-height: 1.4;
     }
 
     .auth-form {
         display: flex;
         flex-direction: column;
         gap: 20px;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
     }
 
     .form-group {
@@ -140,7 +161,7 @@
     }
 
     .auth-button {
-        background: linear-gradient(135deg, #3498db, #2980b9);
+        background: linear-gradient(135deg, #27ae60, #229954);
         color: white;
         border: none;
         padding: 15px;
@@ -149,28 +170,23 @@
         font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
+        margin-top: 10px;
     }
 
     .auth-button:hover {
         transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
-    }
-
-    .auth-button:active {
-        transform: translateY(0);
+        box-shadow: 0 8px 25px rgba(39, 174, 96, 0.3);
     }
 
     .auth-links {
         text-align: center;
-        margin-top: 20px;
+        margin-top: 25px;
     }
 
     .auth-links a {
         color: #3498db;
         text-decoration: none;
-        font-size: 0.9em;
+        font-size: 0.95em;
         transition: color 0.3s ease;
     }
 
@@ -179,33 +195,11 @@
         text-decoration: underline;
     }
 
-    .welcome-message {
-        text-align: center;
-        padding: 20px 0;
-    }
+    @media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
 
-    .welcome-message h3 {
-        color: #2c3e50;
-        margin-bottom: 15px;
-    }
-
-    .dashboard-link {
-        display: inline-block;
-        background: #27ae60;
-        color: white;
-        padding: 12px 25px;
-        border-radius: 8px;
-        text-decoration: none;
-        margin-top: 15px;
-        transition: all 0.3s ease;
-    }
-
-    .dashboard-link:hover {
-        background: #229954;
-        transform: translateY(-2px);
-    }
-
-    @media (max-width: 480px) {
         .auth-card {
             padding: 30px 20px;
             margin: 10px;
@@ -213,6 +207,12 @@
 
         .auth-card h2 {
             font-size: 1.6em;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .auth-card {
+            padding: 25px 15px;
         }
     }
 </style>

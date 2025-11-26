@@ -1,19 +1,19 @@
 <?php
-
 use Src\Route;
 
-Route::add(['GET','POST'], '/employees', [Controller\EmployeeController::class, 'employees'])->middleware('auth');
-Route::add(['GET'], '/add-employee', [Controller\EmployeeController::class, 'addEmployeeForm'])->middleware('auth');
-Route::add(['POST'], '/add-employee', [Controller\EmployeeController::class, 'addEmployee'])->middleware('auth');
+Route::add(['GET', 'POST'], '/', [Controller\Site::class, 'login']);
+Route::add(['GET', 'POST'], '/signup', [Controller\Site::class, 'signup']);
+Route::add('GET', '/logout', [Controller\Site::class, 'logout']);
+Route::add('GET', '/profile', [Controller\ProfileController::class, 'profile']);
 
-Route::add(['GET','POST'], '/units', [Controller\UnitController::class, 'units'])->middleware('auth');
-Route::add(['GET'], '/add-unit', [Controller\UnitController::class, 'addUnitForm'])->middleware('auth');
-Route::add(['POST'], '/add-unit', [Controller\UnitController::class, 'addUnit'])->middleware('auth');
+Route::add('GET', '/dashboard', [Controller\AdminController::class, 'dashboard']);
+Route::add('GET', '/admin/dashboard', [Controller\AdminController::class, 'dashboard']);
 
-Route::add(['GET','POST'], '/users', [Controller\UserController::class, 'users'])->middleware('admin');
-Route::add(['GET'], '/add-user', [Controller\UserController::class, 'addUserForm'])->middleware('admin');
-Route::add(['POST'], '/add-user', [Controller\UserController::class, 'addUser'])->middleware('admin');
+Route::add(['GET', 'POST'], '/employees/create', [Controller\EmployeeController::class, 'create'])->middleware('auth');
+Route::add(['GET'], '/employee/by_category', [Controller\EmployeeController::class, 'employeesByCategory']);
+Route::add(['GET', 'POST'], '/employee/change_division', [Controller\EmployeeController::class, 'changeDivision']);
 
-Route::add(['GET', 'POST'], '/login', [Controller\AuthController::class, 'login'])->middleware('antiauth');
-Route::add(['GET', 'POST'], '/', [Controller\AuthController::class, 'login'])->middleware('antiauth');
-Route::add('GET', '/logout', [Controller\AuthController::class, 'logout']);
+Route::add('GET', '/divisions/show', [Controller\DivisionController::class, 'show']);
+Route::add(['GET', 'POST'], '/divisions/create', [Controller\DivisionController::class, 'createDivision']);
+
+Route::add(['GET', 'POST'], '/admin/create_hr', [Controller\AdminController::class, 'createHr']);

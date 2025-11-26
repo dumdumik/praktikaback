@@ -12,10 +12,7 @@ class Settings
     {
         $this->_settings = $settings;
     }
-    public function getDbSetting(): array
-    {
-        return $this->db ?? [];
-    }
+
     public function __get($key)
     {
         if (array_key_exists($key, $this->_settings)) {
@@ -32,5 +29,10 @@ class Settings
     public function getViewsPath(): string
     {
         return '/' . $this->path['views'] ?? '';
+    }
+
+    public function getDbSetting(): array
+    {
+        return $this->db ?? [];
     }
 }

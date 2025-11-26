@@ -4,43 +4,123 @@ namespace Model;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Validators\EmployeeValidator;
+use Src\Request;
 
-class Employee extends Model
+class Employee  extends Model
 {
     use HasFactory;
-
-    public $fillable = [
-        'name',
-        'last_name',
-        'patronym',
-        'gender_id',
-        'birth_date',
-        'address',
-        'position_id',
-        'unit_id',
-        'staff_id',
-        'creator_id'
-    ];
     public $timestamps = false;
+    protected $fillable = [
+        'last_name', 'first_name', 'middle_name',
+        'birth_date', 'registration_address',
+        'division_id', 'staff_category_id', 'position_id'
+    ];
 
-    public function gender(): BelongsTo
+    public static function createEmployee(array $data): self
     {
-        return $this->belongsTo(Gender::class, 'gender_id', 'id');
+        $validator = EmployeeValidator::validateCreate(new Request($data));
+
+        if (!$validator['valid']) {
+            $errorMessages = [];
+            foreach ($validator['errors'] as $field => $errors) {
+                $errorMessages[] = implode(', ', $errors);
+            }
+            throw new \InvalidArgumentException(implode('; ', $errorMessages));
+        }
+
+        $employee = self::create($data);
+
+        $division = Division::find($employee->division_id);
+        if ($division) {
+            $division->updateDivisionStats();
+        }
+        return $employee;
     }
 
-    public function position(): BelongsTo
+    public static function changeDivision(int $employeeId, ?int $newDivisionId): bool
     {
-        return $this->belongsTo(Position::class, 'position_id', 'id');
+        if ($newDivisionId === null) {
+            throw new \InvalidArgumentException('Не выбрано новое подразделение');
+        }
+
+        $employee = self::findOrFail($employeeId);
+        $oldDivisionId = $employee->division_id;
+
+        $employee->division_id = $newDivisionId;
+        $result = $employee->save();
+
+        if ($result) {
+            Division::find($oldDivisionId)?->updateDivisionStats();
+            Division::find($newDivisionId)?->updateDivisionStats();
+        }
+
+        return $result;
     }
 
-    public function unit(): BelongsTo
+    public static function getByCategory(?int $categoryId = null)
     {
-        return $this->belongsTo(Unit::class, 'unit_id', 'id');
+        $query = self::with([
+            'position',
+            'division',
+            'staffCategory'
+        ]);
+
+        if ($categoryId !== null) {
+            $query->where('staff_category_id', $categoryId);
+        }
+
+        return $query->get();
     }
 
-    public function staff(): BelongsTo
+    public function division(){
+        return $this->belongsTo(Division::class, 'division_id', 'division_id');
+    }
+
+    public function staffCategory(){
+        return $this->belongsTo(StaffCategory::class, 'staff_category_id', 'staff_category_id');
+    }
+
+    public function position() {
+        return $this->belongsTo(Position::class, 'position_id', 'position_id');
+    }
+
+    public function getFullNameAttribute(): string{
+        return trim("{$this->last_name} {$this->first_name} {$this->middle_name}");
+    }
+
+    public function getAgeAttribute(): int{
+        $birthday = new \DateTime($this->birth_date);
+        $today = new \DateTime();
+        return $today->diff($birthday)->y;
+    }
+
+    public static function findByDivision(int $divisionId){
+        return self::where('division_id', $divisionId)->get()->toArray();
+    }
+
+    public static function averageAgeByDivision(){
+        return self::selectRaw('
+                divisions.division_id,
+                divisions.division_name,
+                AVG(YEAR(CURRENT_DATE) - YEAR(employees.birth_date)) as avg_age,
+                COUNT(employees.id) as employee_count
+            ')
+            ->join('divisions', 'employees.division_id', '=', 'divisions.division_id')
+            ->groupBy('divisions.division_id', 'divisions.division_name')
+            ->get()
+            ->toArray();
+    }
+
+    public static function findByStaffCategory(int $categoryId){
+        return self::where('staff_category_id', $categoryId)->get()->toArray();
+    }
+
+    public static function getAllWithDivisions()
     {
-        return $this->belongsTo(Staff::class, 'staff_id', 'id');
+        return [
+            'employees' => self::all(),
+            'divisions' => Division::all()
+        ];
     }
 }
