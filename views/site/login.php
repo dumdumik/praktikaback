@@ -1,44 +1,41 @@
 <div class="auth-container">
     <div class="auth-card">
-        <h2>Авторизация</h2>
-        <div class="auth-message"><?= $message ?? ''; ?></div>
+        <div class="auth-header">
+            <h2>Вход в систему</h2>
+            <p>Введите ваши учетные данные</p>
+        </div>
 
-        <?php if (!app()->auth::check()): ?>
-            <form method="post" class="auth-form">
-                <input name="csrf_token" type="hidden" value="<?= app()->auth::generateCSRF() ?>"/>
-
-                <div class="form-group">
-                    <div class="input-wrapper">
-                        <input type="text" name="login" placeholder=" " required>
-                        <label>Логин</label>
-                        <span class="input-icon">👤</span>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="input-wrapper">
-                        <input type="password" name="password" placeholder=" " required>
-                        <label>Пароль</label>
-                        <span class="input-icon">🔒</span>
-                    </div>
-                </div>
-
-                <button type="submit" class="auth-button">
-                    <span>Войти</span>
-                    <div class="button-loader"></div>
-                </button>
-
-                <div class="auth-links">
-                    <a href="<?= app()->route->getUrl('/signup') ?>">Нет аккаунта? Зарегистрируйтесь</a>
-                </div>
-            </form>
-        <?php else: ?>
-            <div class="welcome-message">
-                <h3>Добро пожаловать, <?= htmlspecialchars(app()->auth->user()->name) ?>!</h3>
-                <p>Вы уже авторизованы в системе.</p>
-                <a href="<?= app()->route->getUrl('/dashboard') ?>" class="dashboard-link">Перейти в дашборд</a>
+        <?php if (isset($message) && $message): ?>
+            <div class="alert alert-error">
+                <?= $message ?>
             </div>
         <?php endif; ?>
+
+        <form method="post" class="auth-form">
+            <input name="csrf_token" type="hidden" value="<?= app()->auth::generateCSRF() ?>"/>
+
+            <div class="form-group">
+                <label for="login">Логин</label>
+                <div class="input-wrapper">
+                    <input type="text" id="login" name="login" placeholder="Введите ваш логин" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password">Пароль</label>
+                <div class="input-wrapper">
+                    <input type="password" id="password" name="password" placeholder="Введите ваш пароль" required>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary w-full">
+                Войти в систему
+            </button>
+
+            <div class="auth-footer">
+                <p>Нет аккаунта? <a href="<?= app()->route->getUrl('/signup') ?>">Зарегистрируйтесь</a></p>
+            </div>
+        </form>
     </div>
 </div>
 
@@ -52,32 +49,43 @@
     }
 
     .auth-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
+        background: var(--card-bg);
         padding: 40px;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        border-radius: 12px;
+        box-shadow: var(--shadow-lg);
+        border: 1px solid var(--border);
         width: 100%;
-        max-width: 450px;
-        border: 1px solid rgba(255, 255, 255, 0.2);
+        max-width: 400px;
     }
 
-    .auth-card h2 {
+    .auth-header {
         text-align: center;
-        color: #2c3e50;
-        margin-bottom: 30px;
-        font-size: 2em;
+        margin-bottom: 32px;
+    }
+
+    .auth-header h2 {
+        color: var(--text);
+        font-size: 24px;
         font-weight: 600;
+        margin-bottom: 8px;
     }
 
-    .auth-message {
-        background: #e74c3c;
-        color: white;
-        padding: 12px;
+    .auth-header p {
+        color: var(--text-light);
+        font-size: 14px;
+    }
+
+    .alert {
+        padding: 12px 16px;
         border-radius: 8px;
-        margin-bottom: 20px;
-        text-align: center;
-        font-size: 0.9em;
+        margin-bottom: 24px;
+        font-size: 14px;
+    }
+
+    .alert-error {
+        background: #FEF2F2;
+        color: #DC2626;
+        border: 1px solid #FECACA;
     }
 
     .auth-form {
@@ -87,132 +95,88 @@
     }
 
     .form-group {
-        position: relative;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
     }
 
-    .input-wrapper {
-        position: relative;
+    label {
+        font-weight: 500;
+        color: var(--text);
+        font-size: 14px;
     }
 
     .input-wrapper input {
         width: 100%;
-        padding: 15px 45px 15px 15px;
-        border: 2px solid #e1e8ed;
-        border-radius: 12px;
-        font-size: 1em;
-        background: #f8f9fa;
-        transition: all 0.3s ease;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 14px;
+        transition: all 0.2s;
+        background-color: var(--card-bg);
     }
 
     .input-wrapper input:focus {
-        border-color: #3498db;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     }
 
-    .input-wrapper input:placeholder-shown + label {
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1em;
-        color: #95a5a6;
+    .input-wrapper input::placeholder {
+        color: var(--text-lighter);
     }
 
-    .input-wrapper label {
-        position: absolute;
-        top: -10px;
-        left: 15px;
-        background: white;
-        padding: 0 8px;
-        font-size: 0.8em;
-        color: #3498db;
-        transition: all 0.3s ease;
-        pointer-events: none;
-    }
-
-    .input-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1.2em;
-        color: #95a5a6;
-    }
-
-    .auth-button {
-        background: linear-gradient(135deg, #3498db, #2980b9);
-        color: white;
+    .btn {
+        padding: 10px 16px;
         border: none;
-        padding: 15px;
-        border-radius: 12px;
-        font-size: 1.1em;
-        font-weight: 600;
+        border-radius: 6px;
+        font-size: 14px;
+        font-weight: 500;
         cursor: pointer;
-        transition: all 0.3s ease;
-        position: relative;
-        overflow: hidden;
-    }
-
-    .auth-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
-    }
-
-    .auth-button:active {
-        transform: translateY(0);
-    }
-
-    .auth-links {
-        text-align: center;
-        margin-top: 20px;
-    }
-
-    .auth-links a {
-        color: #3498db;
+        transition: all 0.2s;
         text-decoration: none;
-        font-size: 0.9em;
-        transition: color 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
     }
 
-    .auth-links a:hover {
-        color: #2980b9;
-        text-decoration: underline;
-    }
-
-    .welcome-message {
-        text-align: center;
-        padding: 20px 0;
-    }
-
-    .welcome-message h3 {
-        color: #2c3e50;
-        margin-bottom: 15px;
-    }
-
-    .dashboard-link {
-        display: inline-block;
-        background: #27ae60;
+    .btn-primary {
+        background-color: var(--primary);
         color: white;
-        padding: 12px 25px;
-        border-radius: 8px;
-        text-decoration: none;
-        margin-top: 15px;
-        transition: all 0.3s ease;
     }
 
-    .dashboard-link:hover {
-        background: #229954;
-        transform: translateY(-2px);
+    .btn-primary:hover {
+        background-color: var(--primary-dark);
+    }
+
+    .w-full {
+        width: 100%;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 16px;
+    }
+
+    .auth-footer p {
+        color: var(--text-light);
+        font-size: 14px;
+    }
+
+    .auth-footer a {
+        color: var(--primary);
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
     }
 
     @media (max-width: 480px) {
         .auth-card {
-            padding: 30px 20px;
-            margin: 10px;
-        }
-
-        .auth-card h2 {
-            font-size: 1.6em;
+            padding: 24px;
+            margin: 0 16px;
         }
     }
 </style>

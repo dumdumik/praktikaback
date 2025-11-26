@@ -1,302 +1,206 @@
-<div class="container">
-    <div class="form-card">
-        <div class="form-header">
-            <h2>Добавление нового подразделения</h2>
-            <p>Создание нового структурного подразделения компании</p>
+<div class="form-container">
+    <div class="form-header">
+        <h1 class="form-title">Добавление подразделения</h1>
+        <p class="form-subtitle">Создание нового подразделения в организации</p>
+    </div>
+
+    <?php if (isset($message) && $message): ?>
+        <div class="alert alert-error">
+            <span class="alert-icon">⚠</span>
+            <?= htmlspecialchars($message) ?>
         </div>
+    <?php endif; ?>
 
-        <?php if (isset($message) && $message): ?>
-            <div class="alert alert-error">
-                ❌ <?= $message ?>
-            </div>
-        <?php endif; ?>
-
+    <div class="form-wrapper">
         <form method="POST" class="modern-form">
             <input name="csrf_token" type="hidden" value="<?= app()->auth::generateCSRF() ?>"/>
 
-            <div class="form-section">
-                <h3>Основная информация</h3>
+            <div class="input-field">
+                <label for="division_name" class="input-label">
+                    Название подразделения
+                    <span class="required-star">*</span>
+                </label>
+                <input type="text"
+                       id="division_name"
+                       name="division_name"
+                       class="text-input"
+                       placeholder="Введите название подразделения"
+                       value="<?= htmlspecialchars($old['division_name'] ?? '') ?>"
+                       required>
+                <?php if (isset($errors['division_name'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['division_name']) ?></div>
+                <?php endif; ?>
+            </div>
 
-                <div class="form-group">
-                    <label for="division_name" class="form-label">
-                        Название подразделения *
-                    </label>
-                    <div class="input-wrapper">
-                        <input type="text" id="division_name" name="division_name"
-                               value="<?= htmlspecialchars($old['division_name'] ?? '') ?>"
-                               placeholder="Введите название подразделения"
-                               class="form-input"
-                               required>
-                        <span class="input-icon">🏢</span>
-                    </div>
-                    <div class="input-hint">Введите полное название подразделения</div>
-                </div>
-
-                <div class="form-group">
-                    <label for="division_type_id" class="form-label">
-                        Тип подразделения *
-                    </label>
-                    <div class="input-wrapper select-wrapper">
-                        <select id="division_type_id" name="division_type_id"
-                                class="form-select"
-                                required>
-                            <option value="">Выберите тип подразделения</option>
-                            <?php foreach ($division_types as $division_type): ?>
-
-                                <option value="<?= $division_type->division_type_id ?>"
-
-                                    <?= ($old['division_type_id'] ?? '') == $division_type->division_type_id ? 'selected' : '' ?>>
-                                    <?= htmlspecialchars($division_type->division_type_name) ?> <!--  --> <!-- division_type_id -->
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                        <span class="input-icon">📊</span>
-                    </div>
-                    <div class="input-hint">Выберите тип из существующих</div>
-                </div>
+            <div class="input-field">
+                <label for="division_type_id" class="input-label">
+                    Тип подразделения
+                    <span class="required-star">*</span>
+                </label>
+                <select id="division_type_id" name="division_type_id" class="select-input" required>
+                    <option value="">Выберите тип подразделения</option>
+                    <?php foreach ($division_types as $type): ?>
+                        <option value="<?= $type->division_type_id ?>"
+                            <?= ($old['division_type_id'] ?? '') == $type->division_type_id ? 'selected' : '' ?>>
+                            <?= htmlspecialchars($type->division_type_name) ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+                <?php if (isset($errors['division_type_id'])): ?>
+                    <div class="error-message"><?= htmlspecialchars($errors['division_type_id']) ?></div>
+                <?php endif; ?>
             </div>
 
             <div class="form-actions">
-                <button type="submit" class="btn btn-primary">
-                    <span>🏢 Создать подразделение</span>
+                <button type="submit" class="btn-primary">
+                    <span class="btn-icon">+</span>
+                    Создать подразделение
                 </button>
-                <a href="<?= app()->route->getUrl('/dashboard') ?>" class="btn btn-secondary">Отмена</a>
-            </div>
-
-            <div class="form-footer">
-                <small>* Поля, обязательные для заполнения</small>
+                <a href="<?= app()->route->getUrl('/divisions') ?>" class="btn-secondary">
+                    Отмена
+                </a>
             </div>
         </form>
     </div>
 </div>
 
 <style>
-    .container {
-        max-width: 600px;
-        margin: 30px auto;
-        padding: 20px;
-    }
-
-    .form-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-        padding: 40px;
-        border: 1px solid #e1e8ed;
+    .form-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
     }
 
     .form-header {
         text-align: center;
-        margin-bottom: 40px;
+        margin-bottom: 2rem;
     }
 
-    .form-header h2 {
-        color: #2c3e50;
-        font-size: 2em;
-        margin-bottom: 10px;
+    .form-title {
+        font-size: 1.5rem;
         font-weight: 600;
+        color: #1a1a1a;
+        margin: 0 0 0.5rem 0;
     }
 
-    .form-header p {
-        color: #7f8c8d;
-        font-size: 1.1em;
+    .form-subtitle {
+        color: #666;
+        margin: 0;
+        font-size: 0.9rem;
     }
 
-    .alert {
-        padding: 15px 20px;
-        border-radius: 10px;
-        margin-bottom: 30px;
-        font-weight: 500;
-        text-align: center;
-    }
-
-    .alert-error {
-        background: #ffeaea;
-        color: #e74c3c;
-        border: 1px solid #f5b7b1;
-    }
-
-    .modern-form {
-        display: flex;
-        flex-direction: column;
-        gap: 30px;
-    }
-
-    .form-section {
-        margin-bottom: 20px;
-    }
-
-    .form-section h3 {
-        color: #3498db;
-        margin-bottom: 25px;
-        font-size: 1.3em;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .form-section h3::before {
-        content: '';
-        width: 4px;
-        height: 20px;
-        background: #3498db;
-        border-radius: 2px;
-    }
-
-    .form-group {
-        margin-bottom: 25px;
-    }
-
-    .form-label {
-        display: block;
-        margin-bottom: 8px;
-        font-weight: 600;
-        color: #2c3e50;
-        font-size: 1em;
-    }
-
-    .input-wrapper {
-        position: relative;
-    }
-
-    .form-input,
-    .form-select {
+    .form-wrapper {
         width: 100%;
-        padding: 15px 45px 15px 15px;
-        border: 2px solid #e1e8ed;
-        border-radius: 12px;
-        font-size: 1em;
-        background: #f8f9fa;
-        transition: all 0.3s ease;
-        font-family: inherit;
     }
 
-    .form-select {
-        appearance: none;
-        cursor: pointer;
+    .input-field {
+        margin-bottom: 1.5rem;
     }
 
-    .form-input:focus,
-    .form-select:focus {
-        border-color: #3498db;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    .input-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #333;
+        font-size: 0.9rem;
+    }
+
+    .required-star {
+        color: #e53e3e;
+    }
+
+    .text-input,
+    .select-input {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.2s;
+        background: #fff;
+    }
+
+    .text-input:focus,
+    .select-input:focus {
         outline: none;
+        border-color: #3182ce;
+        box-shadow: 0 0 0 3px rgba(49, 130, 206, 0.1);
     }
 
-    .select-wrapper::after {
-        content: '▼';
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #95a5a6;
-        font-size: 0.8em;
-        pointer-events: none;
-    }
-
-    .input-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1.2em;
-        color: #95a5a6;
-    }
-
-    .select-wrapper .input-icon {
-        right: 35px;
-    }
-
-    .input-hint {
-        font-size: 0.85em;
-        color: #7f8c8d;
-        margin-top: 8px;
+    .text-input::placeholder {
+        color: #a0aec0;
     }
 
     .form-actions {
         display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 30px;
-        padding-top: 20px;
-        border-top: 2px solid #f1f2f6;
-    }
-
-    .btn {
-        padding: 12px 30px;
-        border: none;
-        border-radius: 10px;
-        font-size: 1em;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-family: inherit;
+        gap: 1rem;
+        margin-top: 2rem;
     }
 
     .btn-primary {
-        background: linear-gradient(135deg, #3498db, #2980b9);
+        background: #3182ce;
         color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background 0.2s;
     }
 
     .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
+        background: #2c5aa0;
     }
 
     .btn-secondary {
-        background: #95a5a6;
-        color: white;
+        background: #fff;
+        color: #4a5568;
+        border: 2px solid #e2e8f0;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
     }
 
     .btn-secondary:hover {
-        background: #7f8c8d;
-        transform: translateY(-2px);
+        border-color: #3182ce;
+        color: #3182ce;
     }
 
-    .form-footer {
-        text-align: center;
-        margin-top: 20px;
-        padding-top: 20px;
-        border-top: 1px solid #e9ecef;
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
     }
 
-    .form-footer small {
-        color: #7f8c8d;
-        font-size: 0.85em;
+    .alert-error {
+        background: #fed7d7;
+        color: #c53030;
+        border: 1px solid #feb2b2;
     }
 
-    @media (max-width: 768px) {
-        .container {
-            padding: 15px;
-        }
-
-        .form-card {
-            padding: 30px 20px;
-        }
-
-        .form-actions {
-            flex-direction: column;
-        }
-
-        .btn {
-            width: 100%;
-            justify-content: center;
-        }
+    .error-message {
+        color: #e53e3e;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
     }
 
-    @media (max-width: 480px) {
-        .form-card {
-            padding: 25px 15px;
-        }
-
-        .form-header h2 {
-            font-size: 1.6em;
-        }
+    .btn-icon {
+        font-weight: bold;
     }
 </style>

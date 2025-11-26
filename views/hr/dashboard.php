@@ -1,197 +1,334 @@
+<div class="dashboard">
+    <div class="dashboard-header">
+        <h1>Дашборд HR</h1>
+        <p>Обзор системы управления персоналом</p>
+    </div>
 
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">
+                👥
+            </div>
+            <div class="stat-content">
+                <div class="stat-number"><?= $total_employees ?? '0' ?></div>
+                <div class="stat-label">Всего сотрудников</div>
+            </div>
+        </div>
 
-<div class="dashboard-grid">
-    <div class="quick-actions">
-        <h3>Быстрые действия</h3>
-        <div class="action-buttons">
-            <a href="<?= app()->route->getUrl('/employees/create') ?>" class="action-btn primary">
-                <span>➕</span>
-                Добавить сотрудника
-            </a>
-            <a href="<?= app()->route->getUrl('/divisions/create') ?>" class="action-btn secondary">
-                <span>🏢</span>
-                Добавить подразделение
-            </a>
-            <a href="<?= app()->route->getUrl('/employee/by_category') ?>" class="action-btn success">
-                <span>👥</span>
-                Сотрудники по составу
-            </a>
+        <div class="stat-card">
+            <div class="stat-icon success">
+                🏢
+            </div>
+            <div class="stat-content">
+                <div class="stat-number"><?= $total_divisions ?? '0' ?></div>
+                <div class="stat-label">Подразделений</div>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon warning">
+                💼
+            </div>
+            <div class="stat-content">
+                <div class="stat-number"><?= $total_positions ?? '0' ?></div>
+                <div class="stat-label">Должностей</div>
+            </div>
         </div>
     </div>
 
-    <div class="stats-section">
-        <h3>Статистика по подразделениям</h3>
-        <div class="stats-grid">
-            <?php foreach ($divisions as $division): ?>
-                <div class="stat-card">
-                    <h4><?= htmlspecialchars($division->division_name) ?></h4>
-                    <div class="stat-numbers">
-                        <div class="stat-item">
-                            <span class="label">Сотрудников:</span>
-                            <span class="value"><?= $division->employee_count ?></span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="label">Средний возраст:</span>
-                            <span class="value"><?= $division->average_age ?? '—' ?></span>
-                        </div>
-                    </div>
-                    <a href="/pop-it-mvc/divisions/show?id=<?= $division->division_id ?>" class="view-details">
-                        Подробнее →
-                    </a>
+    <div class="actions-section">
+        <h2>Быстрые действия</h2>
+        <div class="actions-grid">
+            <a href="<?= app()->route->getUrl('/employees/create') ?>" class="action-card">
+                <div class="action-icon primary">➕</div>
+                <div class="action-content">
+                    <h3>Добавить сотрудника</h3>
+                    <p>Создание новой записи сотрудника</p>
                 </div>
-            <?php endforeach; ?>
+            </a>
+
+            <a href="<?= app()->route->getUrl('/divisions/create') ?>" class="action-card">
+                <div class="action-icon success">🏢</div>
+                <div class="action-content">
+                    <h3>Добавить подразделение</h3>
+                    <p>Создание нового подразделения</p>
+                </div>
+            </a>
+
+            <a href="<?= app()->route->getUrl('/employee/by_category') ?>" class="action-card">
+                <div class="action-icon warning">👥</div>
+                <div class="action-content">
+                    <h3>Сотрудники по составу</h3>
+                    <p>Фильтрация по категориям</p>
+                </div>
+            </a>
         </div>
     </div>
+
+    <?php if (!empty($divisions)): ?>
+        <div class="divisions-section">
+            <h2>Статистика подразделений</h2>
+            <div class="divisions-grid">
+                <?php foreach ($divisions as $division): ?>
+                    <div class="division-card">
+                        <h3><?= htmlspecialchars($division->division_name) ?></h3>
+                        <div class="division-stats">
+                            <div class="division-stat">
+                                <span class="stat-value"><?= $division->employee_count ?></span>
+                                <span class="stat-label">сотрудников</span>
+                            </div>
+                            <div class="division-stat">
+                                <span class="stat-value"><?= $division->average_age ?? '—' ?></span>
+                                <span class="stat-label">средний возраст</span>
+                            </div>
+                        </div>
+                        <a href="/pop-it-mvc/divisions/show?id=<?= $division->division_id ?>" class="btn btn-outline btn-sm">
+                            Подробнее
+                        </a>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>
 
 <style>
-    .dashboard-grid {
+    .dashboard {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 20px;
     }
 
-    .quick-actions {
-        margin-bottom: 40px;
+    .dashboard-header {
+        margin-bottom: 32px;
     }
 
-    .quick-actions h3 {
-        color: #2c3e50;
-        margin-bottom: 20px;
-        font-size: 1.5em;
+    .dashboard-header h1 {
+        font-size: 32px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
     }
 
-    .action-buttons {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-    }
-
-    .action-btn {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        padding: 20px;
-        border-radius: 12px;
-        text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    .action-btn.primary {
-        background: linear-gradient(135deg, #3498db, #2980b9);
-        color: white;
-    }
-
-    .action-btn.secondary {
-        background: linear-gradient(135deg, #9b59b6, #8e44ad);
-        color: white;
-    }
-
-    .action-btn.success {
-        background: linear-gradient(135deg, #27ae60, #229954);
-        color: white;
-    }
-
-    .action-btn:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    }
-
-    .action-btn span {
-        font-size: 1.5em;
-    }
-
-    .stats-section h3 {
-        color: #2c3e50;
-        margin-bottom: 25px;
-        font-size: 1.5em;
+    .dashboard-header p {
+        color: var(--text-light);
+        font-size: 16px;
     }
 
     .stats-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 25px;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
     }
 
     .stat-card {
-        background: white;
-        padding: 25px;
+        background: var(--card-bg);
+        padding: 24px;
         border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border-left: 5px solid #3498db;
-        transition: all 0.3s ease;
-    }
-
-    .stat-card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
-    }
-
-    .stat-card h4 {
-        color: #2c3e50;
-        margin-bottom: 15px;
-        font-size: 1.2em;
-    }
-
-    .stat-numbers {
-        margin-bottom: 15px;
-    }
-
-    .stat-item {
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
         display: flex;
-        justify-content: space-between;
         align-items: center;
-        margin-bottom: 8px;
-        padding: 8px 0;
-        border-bottom: 1px solid #f1f2f6;
+        gap: 16px;
     }
 
-    .stat-item:last-child {
-        border-bottom: none;
+    .stat-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
     }
 
-    .stat-item .label {
-        color: #7f8c8d;
-        font-size: 0.9em;
+    .stat-icon.primary {
+        background: #EFF6FF;
+        color: var(--primary);
     }
 
-    .stat-item .value {
-        color: #2c3e50;
+    .stat-icon.success {
+        background: #ECFDF5;
+        color: var(--success);
+    }
+
+    .stat-icon.warning {
+        background: #FFFBEB;
+        color: var(--warning);
+    }
+
+    .stat-number {
+        font-size: 28px;
         font-weight: 600;
-        font-size: 1.1em;
+        color: var(--text);
+        line-height: 1;
     }
 
-    .view-details {
-        display: inline-block;
-        color: #3498db;
+    .stat-label {
+        color: var(--text-light);
+        font-size: 14px;
+        margin-top: 4px;
+    }
+
+    .actions-section {
+        margin-bottom: 40px;
+    }
+
+    .actions-section h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 20px;
+    }
+
+    .actions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .action-card {
+        background: var(--card-bg);
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
         text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s ease;
-        padding: 5px 0;
+        color: inherit;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 16px;
     }
 
-    .view-details:hover {
-        color: #2980b9;
-        transform: translateX(5px);
+    .action-card:hover {
+        box-shadow: var(--shadow-lg);
+        transform: translateY(-2px);
+        border-color: var(--primary);
+    }
+
+    .action-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .action-icon.primary {
+        background: #EFF6FF;
+        color: var(--primary);
+    }
+
+    .action-icon.success {
+        background: #ECFDF5;
+        color: var(--success);
+    }
+
+    .action-icon.warning {
+        background: #FFFBEB;
+        color: var(--warning);
+    }
+
+    .action-content h3 {
+        font-size: 16px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 4px;
+    }
+
+    .action-content p {
+        color: var(--text-light);
+        font-size: 14px;
+    }
+
+    .divisions-section h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 20px;
+    }
+
+    .divisions-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .division-card {
+        background: var(--card-bg);
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+    }
+
+    .division-card h3 {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 16px;
+    }
+
+    .division-stats {
+        display: flex;
+        gap: 24px;
+        margin-bottom: 20px;
+    }
+
+    .division-stat {
+        text-align: center;
+    }
+
+    .stat-value {
+        display: block;
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--text);
+    }
+
+    .stat-label {
+        display: block;
+        color: var(--text-light);
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .btn-outline {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text);
+    }
+
+    .btn-outline:hover {
+        background: var(--bg);
+        border-color: var(--text-light);
+    }
+
+    .btn-sm {
+        padding: 6px 12px;
+        font-size: 12px;
     }
 
     @media (max-width: 768px) {
-        .dashboard-grid {
-            padding: 10px;
-        }
-
-        .action-buttons {
-            grid-template-columns: 1fr;
-        }
-
         .stats-grid {
             grid-template-columns: 1fr;
         }
 
-        .stat-card {
-            padding: 20px;
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .divisions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .division-stats {
+            flex-direction: column;
+            gap: 16px;
         }
     }
 </style>

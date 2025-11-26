@@ -1,187 +1,105 @@
+<div class="page-container">
+    <div class="page-header">
+        <h1>Административная панель</h1>
+        <p>Управление пользователями системы</p>
+    </div>
+
+    <div class="admin-content">
+        <div class="section">
+            <div class="section-header">
+                <h2>Пользователи системы</h2>
+                <a href="<?= app()->route->getUrl('/admin/create_hr') ?>" class="btn btn-primary">
+                    Добавить HR сотрудника
+                </a>
+            </div>
+
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Имя</th>
+                        <th>Фамилия</th>
+                        <th>Логин</th>
+                        <th>Роль</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <?php foreach ($users as $user): ?>
+                        <tr>
+                            <td class="text-muted">#<?= $user->id ?></td>
+                            <td><?= htmlspecialchars($user->name) ?></td>
+                            <td><?= htmlspecialchars($user->lastName) ?></td>
+                            <td><?= htmlspecialchars($user->login) ?></td>
+                            <td>
+                                <span class="badge badge-<?= $user->role === 'admin' ? 'danger' : 'primary' ?>">
+                                    <?= $user->role === 'admin' ? 'Администратор' : 'HR сотрудник' ?>
+                                </span>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
 <style>
-    
-    .admin-container {
-        max-width: 1200px;
-        margin: 30px auto;
-        padding: 30px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    .admin-content {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        overflow: hidden;
     }
-    
-    h2 {
-        color: #2c3e50;
-        margin-bottom: 25px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #e9ecef;
-        font-weight: 600;
+
+    .section {
+        padding: 32px;
     }
-    
-    h4 {
-        color: #495057;
-        margin-bottom: 20px;
-        font-weight: 500;
-    }
-    
-    /* Стили таблицы */
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        margin: 25px 0;
-        font-size: 0.9em;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.03);
-    }
-    
-    thead tr {
-        background-color: #3498db;
-        color: white;
-        text-align: left;
-    }
-    
-    th, td {
-        padding: 15px 20px;
-    }
-    
-    th {
-        font-weight: 500;
-        text-transform: uppercase;
-        font-size: 0.8em;
-        letter-spacing: 0.5px;
-    }
-    
-    tbody tr {
-        border-bottom: 1px solid #e9ecef;
-        transition: all 0.2s;
-    }
-    
-    tbody tr:nth-of-type(even) {
-        background-color: #f8f9fa;
-    }
-    
-    tbody tr:last-of-type {
-        border-bottom: 2px solid #3498db;
-    }
-    
-    tbody tr:hover {
-        background-color: #f1f8fe;
-    }
-    
-    /* Стили бейджей */
-    .badge {
-        display: inline-block;
-        padding: 5px 10px;
-        border-radius: 50px;
-        font-size: 0.75em;
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-    
-    .bg-danger {
-        background-color: #e74c3c;
-        color: white;
-    }
-    
-    .bg-primary {
-        background-color: #3498db;
-        color: white;
-    }
-    
-    /* Стили кнопок */
-    .btn {
-        display: inline-block;
-        padding: 8px 15px;
-        border-radius: 4px;
-        font-size: 0.8em;
-        font-weight: 500;
-        text-align: center;
-        text-decoration: none;
-        transition: all 0.2s;
-        border: none;
-        cursor: pointer;
-    }
-    
-    .btn-sm {
-        padding: 6px 12px;
-        font-size: 0.75em;
-    }
-    
-    .btn-warning {
-        background-color: #f39c12;
-        color: white;
-    }
-    
-    .btn-danger {
-        background-color: #e74c3c;
-        color: white;
-    }
-    
-    .btn-warning:hover {
-        background-color: #e67e22;
-        transform: translateY(-1px);
-    }
-    
-    .btn-danger:hover {
-        background-color: #c0392b;
-        transform: translateY(-1px);
-    }
-    
-    /* Группа кнопок */
-    .btn-group {
+
+    .section-header {
         display: flex;
-        gap: 8px;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
     }
-    
-    /* Адаптивность */
+
+    .section-header h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text);
+        margin: 0;
+    }
+
+    .text-muted {
+        color: var(--text-light);
+        font-family: 'Courier New', monospace;
+    }
+
+    .badge-danger {
+        background: #FEE2E2;
+        color: #DC2626;
+    }
+
+    .badge-primary {
+        background: #EFF6FF;
+        color: var(--primary);
+    }
+
     @media (max-width: 768px) {
-        .admin-container {
-            padding: 15px;
+        .section {
+            padding: 24px;
         }
-        
-        table {
-            display: block;
-            overflow-x: auto;
+
+        .section-header {
+            flex-direction: column;
+            gap: 16px;
+            align-items: flex-start;
         }
-        
-        th, td {
-            padding: 12px 15px;
+
+        .table {
+            font-size: 13px;
         }
     }
 </style>
-
-<div class="admin-container">
-    <h2>Административная панель</h2>
-    
-    <div>
-        <h4>Пользователи системы</h4>
-        
-        <table>
-            <thead>
-               <tr>
-                   <th>ID</th> 
-                   <th>Имя</th>
-                   <th>Фамилия</th>
-                   <th>Логин</th>
-                   <th>Роль</th>
-               </tr>
-            </thead>
-            <tbody>
-                <?php foreach ($users as $user): ?>
-                <tr>
-                    <td><?= $user->id ?></td>
-                    <td><?= htmlspecialchars($user->name) ?></td>
-                    <td><?= htmlspecialchars($user->lastName) ?></td>
-                    <td><?= htmlspecialchars($user->login) ?></td>                   
-                    <td>
-                        <span class="badge bg-<?= $user->role === 'admin' ? 'danger' : 'primary' ?>">
-                            <?= $user->role ?>
-                        </span>
-                    </td>
-                </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
-
-    <a class="btn btn-sm btn-warning" href="<?= app()->route->getUrl('/admin/create_hr') ?>">Добавить нового сотрудника отдела кадров</a>
-</div>

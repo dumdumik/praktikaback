@@ -1,45 +1,44 @@
-<div class="container">
+<div class="page-container">
     <div class="page-header">
-        <h2>Выбор сотрудников по составу</h2>
+        <h1>Сотрудники по составу</h1>
         <p>Фильтрация сотрудников по категориям персонала</p>
     </div>
 
     <div class="filter-card">
         <form method="GET" class="filter-form">
             <div class="form-group">
-                <div class="input-wrapper select-wrapper">
+                <label for="category_id">Категория персонала</label>
+                <div class="input-wrapper">
                     <select id="category_id" name="category_id" required>
                         <option value="">Выберите категорию персонала</option>
                         <?php foreach ($categories as $staff_category): ?>
-                            <option value="<?= $staff_category->staff_category_id ?>"
-                                <?= ($selected_category_id ?? '') == $staff_category->staff_category_id ? 'selected' : '' ?>>
+                            <option value="<?= $staff_category->staff_category_id ?>" <?= ($selected_category_id ?? '') == $staff_category->staff_category_id ? 'selected' : '' ?>>
                                 <?= htmlspecialchars($staff_category->staff_category_name) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
-                    <label for="category_id">Категория персонала</label>
-                    <span class="input-icon">👥</span>
                 </div>
             </div>
             <button type="submit" class="btn btn-primary">
-                <span>🔍 Показать сотрудников</span>
+                Показать сотрудников
             </button>
         </form>
     </div>
 
     <?php if (!empty($employees)): ?>
-        <div class="results-section">
+        <div class="results-card">
             <div class="results-header">
-                <h3>Найдено сотрудников: <?= count($employees) ?></h3>
-                <div class="export-actions">
-                    <button class="btn btn-secondary" onclick="window.print()">
-                        🖨️ Печать
+                <h2>Результаты поиска</h2>
+                <div class="results-meta">
+                    <span class="results-count">Найдено сотрудников: <?= count($employees) ?></span>
+                    <button class="btn btn-outline btn-sm" onclick="window.print()">
+                        Печать
                     </button>
                 </div>
             </div>
 
             <div class="table-container">
-                <table class="modern-table">
+                <table class="table">
                     <thead>
                     <tr>
                         <th>ФИО</th>
@@ -60,21 +59,17 @@
                             </td>
                             <td><?= date('d.m.Y', strtotime($employee->birth_date)) ?></td>
                             <td>
-                                <span class="age-badge">
+                                <span class="badge">
                                     <?= (new DateTime($employee->birth_date))->diff(new DateTime())->y ?> лет
                                 </span>
                             </td>
+                            <td><?= htmlspecialchars($employee->position ? $employee->position->position_name : 'Не указана') ?></td>
                             <td>
-                                <?= htmlspecialchars($employee->position ? $employee->position->position_name : 'Не указана') ?>
-                            </td>
-                            <td>
-                                <span class="category-tag">
+                                <span class="badge badge-success">
                                     <?= htmlspecialchars($employee->staffCategory ? $employee->staffCategory->staff_category_name : 'Не указана') ?>
                                 </span>
                             </td>
-                            <td>
-                                <?= htmlspecialchars($employee->division ? $employee->division->division_name : 'Не указано') ?>
-                            </td>
+                            <td><?= htmlspecialchars($employee->division ? $employee->division->division_name : 'Не указано') ?></td>
                         </tr>
                     <?php endforeach; ?>
                     </tbody>
@@ -87,7 +82,7 @@
             <h3>Сотрудники не найдены</h3>
             <p>В выбранной категории нет сотрудников</p>
             <a href="<?= app()->route->getUrl('/employees/create') ?>" class="btn btn-primary">
-                ➕ Добавить сотрудника
+                Добавить сотрудника
             </a>
         </div>
     <?php else: ?>
@@ -100,40 +95,23 @@
 </div>
 
 <style>
-    .container {
+    .page-container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 20px;
-    }
-
-    .page-header {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .page-header h2 {
-        color: #2c3e50;
-        font-size: 2.2em;
-        margin-bottom: 10px;
-        font-weight: 600;
-    }
-
-    .page-header p {
-        color: #7f8c8d;
-        font-size: 1.1em;
     }
 
     .filter-card {
-        background: white;
-        padding: 30px;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 30px;
+        background: var(--card-bg);
+        padding: 24px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
+        margin-bottom: 24px;
     }
 
     .filter-form {
         display: flex;
-        gap: 20px;
+        gap: 16px;
         align-items: flex-end;
     }
 
@@ -142,99 +120,11 @@
         margin: 0;
     }
 
-    .input-wrapper {
-        position: relative;
-    }
-
-    .input-wrapper select {
-        width: 100%;
-        padding: 15px 45px 15px 15px;
-        border: 2px solid #e1e8ed;
+    .results-card {
+        background: var(--card-bg);
         border-radius: 12px;
-        font-size: 1em;
-        background: #f8f9fa;
-        transition: all 0.3s ease;
-        appearance: none;
-        cursor: pointer;
-    }
-
-    .select-wrapper::after {
-        content: '▼';
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #95a5a6;
-        font-size: 0.8em;
-        pointer-events: none;
-    }
-
-    .input-wrapper select:focus {
-        border-color: #3498db;
-        background: white;
-        box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
-        outline: none;
-    }
-
-    .input-wrapper label {
-        position: absolute;
-        top: -10px;
-        left: 15px;
-        background: white;
-        padding: 0 8px;
-        font-size: 0.8em;
-        color: #3498db;
-        transition: all 0.3s ease;
-        pointer-events: none;
-    }
-
-    .input-icon {
-        position: absolute;
-        right: 35px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 1.2em;
-        color: #95a5a6;
-    }
-
-    .btn {
-        padding: 15px 25px;
-        border: none;
-        border-radius: 10px;
-        font-size: 1em;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .btn-primary {
-        background: linear-gradient(135deg, #3498db, #2980b9);
-        color: white;
-    }
-
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(52, 152, 219, 0.3);
-    }
-
-    .btn-secondary {
-        background: #95a5a6;
-        color: white;
-    }
-
-    .btn-secondary:hover {
-        background: #7f8c8d;
-        transform: translateY(-2px);
-    }
-
-    .results-section {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
         overflow: hidden;
     }
 
@@ -242,162 +132,134 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 25px 30px;
-        background: #f8f9fa;
-        border-bottom: 2px solid #e9ecef;
+        padding: 24px;
+        background: var(--bg);
+        border-bottom: 1px solid var(--border);
     }
 
-    .results-header h3 {
-        color: #2c3e50;
+    .results-header h2 {
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text);
         margin: 0;
-        font-size: 1.3em;
     }
 
-    .export-actions {
+    .results-meta {
         display: flex;
-        gap: 10px;
+        align-items: center;
+        gap: 16px;
+    }
+
+    .results-count {
+        color: var(--text-light);
+        font-size: 14px;
     }
 
     .table-container {
         overflow-x: auto;
     }
 
-    .modern-table {
+    .table {
         width: 100%;
         border-collapse: collapse;
     }
 
-    .modern-table thead {
-        background: #3498db;
-        color: white;
-    }
-
-    .modern-table th {
-        padding: 15px 20px;
+    .table th {
+        background: var(--bg);
+        padding: 12px 16px;
         text-align: left;
         font-weight: 600;
-        font-size: 0.9em;
+        color: var(--text);
+        font-size: 13px;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        border-bottom: 1px solid var(--border);
     }
 
-    .modern-table tbody tr {
-        border-bottom: 1px solid #e9ecef;
-        transition: background-color 0.2s ease;
+    .table td {
+        padding: 16px;
+        border-bottom: 1px solid var(--border-light);
+        color: var(--text);
     }
 
-    .modern-table tbody tr:hover {
-        background-color: #f8f9fa;
-    }
-
-    .modern-table td {
-        padding: 15px 20px;
-        color: #2c3e50;
+    .table tbody tr:hover {
+        background: var(--bg);
     }
 
     .employee-name {
         font-weight: 500;
-        color: #2c3e50;
     }
 
     .employee-name strong {
-        color: #2c3e50;
+        color: var(--text);
     }
 
-    .age-badge {
-        background: #e1f0fa;
-        color: #3498db;
-        padding: 4px 12px;
-        border-radius: 15px;
-        font-size: 0.85em;
-        font-weight: 600;
+    .badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 500;
+        background: var(--bg);
+        color: var(--text);
     }
 
-    .category-tag {
-        background: #e1f7ed;
-        color: #27ae60;
-        padding: 4px 12px;
-        border-radius: 15px;
-        font-size: 0.85em;
-        font-weight: 600;
+    .badge-success {
+        background: #ECFDF5;
+        color: #065F46;
     }
 
     .empty-state {
         text-align: center;
         padding: 60px 20px;
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--border);
     }
 
     .empty-icon {
-        font-size: 4em;
-        margin-bottom: 20px;
+        font-size: 48px;
+        margin-bottom: 16px;
         opacity: 0.5;
     }
 
     .empty-state h3 {
-        color: #2c3e50;
-        margin-bottom: 10px;
-        font-size: 1.5em;
+        font-size: 20px;
+        font-weight: 600;
+        color: var(--text);
+        margin-bottom: 8px;
     }
 
     .empty-state p {
-        color: #7f8c8d;
-        margin-bottom: 25px;
-        font-size: 1.1em;
+        color: var(--text-light);
+        margin-bottom: 24px;
     }
 
     @media (max-width: 768px) {
-        .container {
-            padding: 15px;
-        }
-
         .filter-form {
             flex-direction: column;
-            gap: 15px;
+            align-items: stretch;
         }
 
         .results-header {
             flex-direction: column;
-            gap: 15px;
+            gap: 16px;
             align-items: flex-start;
         }
 
-        .export-actions {
+        .results-meta {
             width: 100%;
+            justify-content: space-between;
         }
 
-        .btn {
-            width: 100%;
-            justify-content: center;
+        .table {
+            font-size: 13px;
         }
 
-        .modern-table {
-            font-size: 0.9em;
-        }
-
-        .modern-table th,
-        .modern-table td {
-            padding: 10px 15px;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .page-header h2 {
-            font-size: 1.8em;
-        }
-
-        .filter-card {
-            padding: 20px;
-        }
-
-        .empty-state {
-            padding: 40px 15px;
-        }
-
-        .empty-icon {
-            font-size: 3em;
+        .table th,
+        .table td {
+            padding: 12px;
         }
     }
 </style>
